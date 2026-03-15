@@ -30,18 +30,22 @@ export default function RootLayout({
       <body
         className={`${bodoni.variable} ${inter.variable} antialiased`}
       >
-        <div className="bg-[#0d4212] ">
-          <Link href='/'>
-              <Image 
-                src={MomentumLogo} 
-                alt="Momentum Logo"
-                width={150}
-              />
-          </Link>
+        <div className="relative h-screen w-full overflow-hidden">
+
+          <div className="absolute inset-0 bg-linear-to-b from-[#0d4212] to-[#010602]"></div>
+
+          <div className="relative z-20 p-4">
+            <Link href="/">
+              <Image src={MomentumLogo} alt="Momentum Logo" width={130} />
+            </Link>
+          </div>
+
+
+          <div>
+            {children}
+          </div>
+
         </div>
-
-        {children}
-
       </body>
     </html>
   );
