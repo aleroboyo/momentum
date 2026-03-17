@@ -30,7 +30,7 @@ const Home = () => {
 
         <section>
 
-          <div>
+          <div className="hidden lg:block">
             <Hamburger />
           </div>
 
@@ -97,7 +97,7 @@ const Home = () => {
 
           <section>
 
-            <div>
+            <div className="hidden lg:block">
               <HowItWorks2 />
             </div>
 
