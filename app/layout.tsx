@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-import { Bodoni_Moda, Inter } from "next/font/google";
-import "@/styles/globals.css";
-import Link from "next/link";
-import Image from "next/image";
+import type { Metadata } from "next"
+import { Bodoni_Moda, Inter } from "next/font/google"
+import "@/styles/globals.css"
+import Link from "next/link"
+import Image from "next/image"
 import MomentumLogo from '@/public/momentum-logo.jpeg'
 
 const bodoni = Bodoni_Moda({
@@ -30,11 +30,11 @@ export default function RootLayout({
       <body
         className={`${bodoni.variable} ${inter.variable} antialiased`}
       >
-        <div className="relative h-screen w-full overflow-hidden">
+        <div className="relative min-h-screen w-full overflow-scroll">
 
           <div className="absolute inset-0 bg-linear-to-b from-[#0d4212] to-[#010602]"></div>
 
-          <div className="relative z-20 p-4">
+          <div className="relative z-20 p-4 lg:hidden">
             <Link href="/">
               <Image src={MomentumLogo} alt="Momentum Logo" width={130} />
             </Link>

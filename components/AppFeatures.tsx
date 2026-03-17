@@ -4,11 +4,11 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Swiper as SwiperClass } from 'swiper'
 import { Autoplay} from 'swiper/modules'
 import 'swiper/css'
-import { appInfo, Info } from '@/data/appInfo'
+import { appFeatures, Feature } from '@/data/appFeatures'
 import { useState, useRef } from 'react'
 import { GoDotFill } from "react-icons/go"
 
-const AppInfo = () => {
+const AppFeatures = () => {
   const [activeIndex, setActiveIndex] = useState<number>(0)
   const swiperRef = useRef<SwiperClass | null>(null)
 
@@ -27,17 +27,17 @@ const AppInfo = () => {
         spaceBetween={30}
         className="w-full"
       >
-        {appInfo.map((info: Info) => (
-          <SwiperSlide key={info.id}>
+        {appFeatures.map((feature: Feature) => (
+          <SwiperSlide key={feature.id}>
             <div className="text-center md:text-lg lg:text-3xl">
-              <h4 className="text-[#f8f5ec]/50">{info.description}</h4>
+              <h4 className="text-[#f8f5ec]/50">{feature.name}</h4>
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
 
       <div className="flex justify-center mt-4 gap-2">
-        {appInfo.map((_, idx) => (
+        {appFeatures.map((_, idx) => (
           <button
             key={idx}
             onClick={() => swiperRef.current?.slideToLoop(idx)}
@@ -54,4 +54,4 @@ const AppInfo = () => {
   )
 }
 
-export default AppInfo
+export default AppFeatures
