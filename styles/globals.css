@@ -36,3 +36,39 @@ button {
   cursor: pointer;
 }
 
+.tinyBlob {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, rgba(240, 234, 214, 0.6), transparent);
+  border-radius: 50%;
+  opacity: 0.2;
+  animation: floatBlob linear infinite;
+}
+
+.tinyBlob1 {
+  left: 10%;
+  animation-duration: 18s;
+}
+
+.tinyBlob2 {
+  left: 50%;
+  animation-duration: 22s;
+}
+
+.tinyBlob3 {
+  left: 80%;
+  animation-duration: 20s;
+}
+
+@keyframes floatBlob {
+  0% {
+    transform: translateY(100vh) translateX(0);
+  }
+  100% {
+    transform: translateY(-10vh) translateX(30px);
+  }
+}
+
+
+

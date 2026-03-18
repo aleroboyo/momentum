@@ -27,21 +27,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${bodoni.variable} ${inter.variable} antialiased`}
-      >
-        <div className="relative min-h-screen w-full overflow-scroll">
+      <body className={`${bodoni.variable} ${inter.variable} antialiased`}>
+        
 
-          <div className="absolute inset-0 bg-linear-to-b from-[#0d4212] to-[#010602]"></div>
+        <div className="min-h-screen w-full flex flex-col bg-linear-to-b from-[#0d4212] to-[#010602] overflow-auto">
 
-          <div className="relative z-20 p-4 lg:hidden">
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <span className="tinyBlob tinyBlob1" />
+            <span className="tinyBlob tinyBlob2" />
+            <span className="tinyBlob tinyBlob3" />
+          </div>
+
+          <div className="p-4 lg:hidden">
             <Link href="/">
               <Image src={MomentumLogo} alt="Momentum Logo" width={130} />
             </Link>
           </div>
 
-
-          <div>
+          <div className="flex-1">
             {children}
           </div>
 

@@ -42,7 +42,7 @@ const AppFeatures = () => {
             key={idx}
             onClick={() => swiperRef.current?.slideToLoop(idx)}
             className={`transition text-2xl ${
-              activeIndex === idx ? "text-[#ffefbf]" : "text-[#ffefbf]/50"
+              activeIndex === idx ? "text-[#fff5d7]" : "text-[#fff5d7]/50"
             }`}
           >
             <GoDotFill />

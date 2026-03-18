@@ -40,7 +40,7 @@ const Home = () => {
 
           <section>
 
-            <div className="relative text-[#ffefbf]">
+            <div className="relative text-[#fff5d7]">
 
               <div className="flex h-full flex-col md:grid md:grid-cols-2 md:px-15 lg:px-4">
                 <div className="flex flex-col items-center pt-15 md:pt-55 font-inter">
@@ -63,11 +63,11 @@ const Home = () => {
                   </div>
 
                   <div className="order-4 md:order-3 lg:flex lg:mr-32 lg:gap-8 lg:mt-20 font-medium md:text-lg lg:text-2xl">
-                    <button onClick={handleGetStarted} className="mt-6 flex items-center gap-2 bg-[#ffefbf] text-[#24421E] py-2 px-4 rounded-full lg:mt-10 lg:px-8 lg:py-4 lg:bg-transparent lg:border-2 lg:border-[#ffefbf] lg:text-[#ffefbf]">
+                    <button onClick={handleGetStarted} className="mt-6 flex items-center gap-2 bg-[#fff5d7]  text-[#24421E] py-2 px-4 rounded-full lg:mt-10 lg:px-8 lg:py-4 lg:bg-transparent lg:border-2 lg:border-[#fff5d7] lg:text-[#fff5d7]">
                       Get Started <span className="hidden lg:flex"><IoIosArrowRoundForward /></span>
                     </button>
                     <Link href='#features'>
-                      <button className="hidden lg:flex mt-10 px-8 py-5 items-center gap-2 bg-[#ffefbf] text-[#24421E] rounded-full">
+                      <button className="hidden lg:flex mt-10 px-8 py-5 items-center gap-2 bg-[#fff5d7] text-[#24421E] rounded-full">
                         Learn More <span><IoIosArrowRoundForward /></span>
                       </button>
                     </Link>
