@@ -15,18 +15,6 @@ const LoginForm = () => {
                     <div className="flex flex-col gap-2 mb-4">
 
                         <Input
-                            label="Name"
-                            width="w-full"
-                            placeholder="Full Name"
-                        />
-
-                        <Input
-                            label="Email"
-                            width="w-full"
-                            placeholder="Email"
-                        />
-
-                        <Input
                             label="Username"
                             width="w-full"
                             placeholder="Username"
@@ -38,12 +26,18 @@ const LoginForm = () => {
                         />
 
                     </div>
+
+                    <div className="font-medium flex justify-end">
+                        <Link href="/reset-password">
+                            Forgot Password?
+                        </Link>
+                    </div>
                 </div>
 
-                <div className="mt-6 flex items-center justify-center">
+                <div className="mt-6 md:mt-10 flex items-center justify-center">
                     <Link href="/signup">
-                        <button className="font-inter  gap-2 bg-[#fff5d7] text-[#24421E] py-3 px-8 rounded-full md:text-lg shadow-lg hover:shadow-xl">
-                            Log In
+                        <button className="font-inter  gap-2 bg-[#fff5d7] text-[#24421E] py-3 px-8 rounded-full md:text-lg border-2 border-[#fff5d7] hover:text-[#fff5d7] hover:bg-[#24421E] hover:font-medium">
+                            Login
                         </button>
                     </Link>
                 </div>
