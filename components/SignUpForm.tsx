@@ -42,7 +42,7 @@ const SignUpForm = () => {
 
                 <div className="mt-6 md:mt-10 flex items-center justify-center">
                     <Link href="/signup">
-                        <button className="font-inter  gap-2 bg-[#fff5d7] text-[#24421E] py-3 px-8 rounded-full md:text-lg lg:text-xl hover:bg-[#fff5d7]/50 border-2 border-[#fff5d7] hover:text-[#fff5d7] hover:font-medium">
+                        <button className="font-inter  gap-2 bg-[#fff5d7] text-[#24421E] py-3 px-8 rounded-full md:text-lg border-2 border-[#fff5d7] hover:text-[#fff5d7] hover:bg-[#24421E] hover:font-medium">
                             Sign Up
                         </button>
                     </Link>

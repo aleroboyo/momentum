@@ -15,7 +15,7 @@ InputProps) => {
   return (
     <div className="flex flex-col font-inter">
 
-      <label className='text-[14px] font-bold text-left md:text-lg lg:text-xl'>{label}</label>
+      <label className='text-[14px] font-bold text-left md:text-lg'>{label}</label>
 
       <input
         type='text'

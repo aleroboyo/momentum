@@ -18,6 +18,10 @@ const Hamburger = () => {
             </div>
 
             <div className="flex gap-8 ">
+                <Link href='/'>
+                    <button className="hover:text-white">Home</button>
+                </Link>
+
                 <Link href='/signup'>
                     <button className="hover:text-white">Sign Up</button>
                 </Link>

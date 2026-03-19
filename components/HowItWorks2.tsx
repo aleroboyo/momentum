@@ -24,7 +24,7 @@ const HowItWorks2 = () => {
                         return (
                             <div
                                 key={step.id}
-                                className={`rounded-4xl shadow-2xl shadow-gray-500 flex flex-col items-center py-4 px-6 w-100 h-110
+                                className={`rounded-4xl shadow-2xl shadow-gray-500 flex flex-col items-center py-4 px-6 w-90 h-100
                                 ${isDark 
                                     ? "bg-[#1a521c] text-white" 
                                     : "bg-[#fff5d7] text-[#353535]"

@@ -17,6 +17,10 @@ const Footer = () => {
                 </Link>
             </div>
 
+            <Link href='/'>
+                    <button className="hover:text-white">Home</button>
+            </Link>
+
             <Link href='/signup'>
                 <button>Sign Up</button>
             </Link>

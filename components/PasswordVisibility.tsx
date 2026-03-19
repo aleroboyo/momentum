@@ -11,7 +11,7 @@ const PasswordVisibility = ({ placeholder, value, onChange, name, width = "w-ful
     return (
         <>
             <div className='font-inter relative flex flex-col'>
-                <label className='text-[14px] md:text-lg font-bold text-left lg:text-xl'>Password</label>
+                <label className='text-[14px] md:text-lg font-bold text-left'>Password</label>
                 <input
                     type={showPassword ? 'text' : 'password'}
                     placeholder={placeholder}
