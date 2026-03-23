@@ -21,6 +21,7 @@ const LoginForm = () => {
                         />
 
                         <PasswordVisibility
+                            label="Password"
                             placeholder='Enter password'
                             width="w-full"
                         />
@@ -28,7 +29,7 @@ const LoginForm = () => {
                     </div>
 
                     <div className="font-medium flex justify-end">
-                        <Link href="/reset-password">
+                        <Link href="/forgot-password">
                             Forgot Password?
                         </Link>
                     </div>

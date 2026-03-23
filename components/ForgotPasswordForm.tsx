@@ -1,10 +1,9 @@
 'use client'
 
 import Input from "./Input"
-import PasswordVisibility from "./PasswordVisibility"
 import Link from "next/link"
 
-const SignUpForm = () => {
+const ForgotPasswordForm = () => {
     return (
         <div className="text-[#24421E]">
 
@@ -15,36 +14,18 @@ const SignUpForm = () => {
                     <div className="flex flex-col gap-2 mb-4">
 
                         <Input
-                            label="Name"
-                            width="w-full"
-                            placeholder="Full Name"
-                        />
-
-                        <Input
                             label="Email"
                             width="w-full"
-                            placeholder="Email"
-                        />
-
-                        <Input
-                            label="Username"
-                            width="w-full"
-                            placeholder="Username"
-                        />
-
-                        <PasswordVisibility
-                            label="Password"
-                            placeholder='Enter password'
-                            width="w-full"
+                            placeholder="Enter email address"
                         />
 
                     </div>
                 </div>
 
                 <div className="mt-6 md:mt-10 flex items-center justify-center">
-                    <Link href="/signup">
+                    <Link href="/forgot-password/success">
                         <button className="font-inter  gap-2 bg-[#fff5d7] text-[#24421E] py-3 px-8 rounded-full md:text-lg border-2 border-[#fff5d7] hover:text-[#fff5d7] hover:bg-[#24421E] hover:font-medium">
-                            Sign Up
+                            Get Reset Link
                         </button>
                     </Link>
                 </div>
@@ -54,4 +35,4 @@ const SignUpForm = () => {
     )
 }
 
-export default SignUpForm
+export default ForgotPasswordForm
