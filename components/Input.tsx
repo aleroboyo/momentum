@@ -2,15 +2,14 @@
 
 type InputProps = {
   label?: string
-  placeholder: string
+  placeholder?: string
   width?: string
   value?: string
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   name?: string
-  list?: string
 }
 
-const Input = ({ label, placeholder, width = "full", value, onChange, name, list }: 
+const Input = ({ label, placeholder, width = "full", value, onChange, name }: 
 InputProps) => {
   return (
     <div className="flex flex-col font-inter">
@@ -24,7 +23,6 @@ InputProps) => {
         value={value}
         onChange={onChange}
         name={name}
-        list={list}
       />
 
     </div>

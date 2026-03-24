@@ -40,7 +40,7 @@ export default function RootLayout({
 
           <div className="p-4 lg:hidden">
             <Link href="/">
-              <Image src={MomentumLogo} alt="Momentum Logo" width={130} />
+              <Image src={MomentumLogo} alt="Momentum Logo" width={130} height={130}/>
             </Link>
           </div>
 
