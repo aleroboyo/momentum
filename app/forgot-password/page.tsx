@@ -5,7 +5,7 @@ import Link from "next/link"
 import { IoIosArrowRoundForward } from "react-icons/io"
 import ForgotPasswordForm from "@/components/ForgotPasswordForm"
 
-const Login = () => {
+const ForgotPassword = () => {
   return (
     <div>
 
@@ -36,4 +36,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default ForgotPassword

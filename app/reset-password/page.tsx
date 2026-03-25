@@ -1,11 +1,12 @@
 'use client'
 
+import { Suspense } from 'react'
 import Hamburger from "@/components/Hamburger"
 import Link from "next/link"
 import { IoIosArrowRoundForward } from "react-icons/io"
 import ResetPasswordForm from "@/components/ResetPasswordForm"
 
-const Login = () => {
+const ResetPassword = () => {
   return (
     <div>
 
@@ -25,7 +26,9 @@ const Login = () => {
           </h4>
 
           <div>
-            <ResetPasswordForm/>
+            <Suspense fallback={<div>Loading...</div>}>
+              <ResetPasswordForm />
+            </Suspense>
           </div>
 
         </div>
@@ -36,4 +39,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default ResetPassword

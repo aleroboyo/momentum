@@ -14,9 +14,9 @@ const Success = () => {
 
             <div className="px-4 font-inter md:text-lg md:mx-24 lg:mx-100">
 
-                <div className="lg:hidden mb-4 md:mt-12">
+                <div className="lg:hidden md:mt-12">
                     <Image
-                        src='/Blooming Padlock _Transparent.png'
+                        src='/Shield - Transparent.png'
                         alt="Paper Plane Image"
                         width={500}
                         height={500}
@@ -25,16 +25,16 @@ const Success = () => {
 
                 <h3 className="text-2xl text-center mb-4 md:-mb-6 font-medium  md:text-4xl md:py-10 lg:text-4xl">Password Reset Successful!</h3>
 
-                <div className="hidden lg:flex justify-center mb-12">
+                <p className="font-light text-center">You are all set. Your password has been updated.</p>
+
+                <div className="hidden lg:flex justify-center">
                     <Image
-                        src='/Blooming Padlock _Transparent.png'
+                        src='/Shield - Transparent.png'
                         alt='Envelope Image'
                         width={500}
                         height={500}
                     />
                 </div>
-
-                <p className="font-light text-center mb-6 lg:-mt-10">You are all set. Your password has been updated.</p>
 
                 <div className="flex justify-center">
                 <Link href="/login">

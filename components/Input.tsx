@@ -9,7 +9,7 @@ type InputProps = {
   name?: string
 }
 
-const Input = ({ label, placeholder, width = "full", value, onChange, name }: 
+const Input = ({ label, placeholder, width = "w-full", value, onChange, name }: 
 InputProps) => {
   return (
     <div className="flex flex-col font-inter">
