@@ -81,7 +81,7 @@ const LoginForm = () => {
                 </div>
 
                 <div className="mt-6 md:mt-10 flex items-center justify-center">
-                        <button type="submit" className="font-inter  gap-2 bg-[#fff5d7] text-[#24421E] py-3 px-8 rounded-full md:text-lg border-2 border-[#fff5d7] hover:text-[#fff5d7] hover:bg-[#24421E] hover:font-medium">
+                        <button type="submit" className="font-inter bg-[#fff5d7] text-[#24421E] py-3 px-8 rounded-full md:text-lg border-2 border-[#fff5d7] hover:text-[#fff5d7] hover:bg-[#24421E] hover:font-medium">
                             Login
                         </button>
                 </div>

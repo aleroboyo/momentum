@@ -1,6 +1,5 @@
 'use client'
 
-import Hamburger from "@/components/Hamburger"
 import Image from "next/image"
 import WelcomeImg from '@/public/Stacking Stones - Square PNG.png'
 import AppFeatures from "@/components/AppFeatures"
@@ -27,14 +26,6 @@ const Home = () => {
     <div>
 
       <main>
-
-        <section>
-
-          <div className="hidden lg:block">
-            <Hamburger />
-          </div>
-
-        </section>
 
         <FadeContent blur={true} duration={1200} ease="power2.out" initialOpacity={0}>
 

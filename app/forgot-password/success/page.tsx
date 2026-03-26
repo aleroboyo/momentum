@@ -1,6 +1,5 @@
 'use client'
 
-import Hamburger from "@/components/Hamburger"
 import Image from "next/image"
 import Link from "next/link"
 import { useState, useRef, useEffect } from "react"
@@ -20,10 +19,6 @@ const Success = () => {
 
     return (
         <div className=" text-[#fff5d7]">
-
-            <div className="hidden lg:block">
-                <Hamburger />
-            </div>
 
             <div className="px-4 font-inter md:text-lg md:mx-24 lg:mx-100">
 

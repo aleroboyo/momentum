@@ -1,0 +1,40 @@
+import { TiHeartFullOutline } from "react-icons/ti"
+import { TbFlowerFilled } from "react-icons/tb"
+import { PiFlowerLotusFill } from "react-icons/pi"
+import { FaLeaf } from "react-icons/fa"
+import { BsStars } from "react-icons/bs"
+import { FaSmile } from "react-icons/fa"
+import { MdOutlineStar } from "react-icons/md"
+import { FaSmileBeam } from "react-icons/fa"
+import { RiDiamondFill } from "react-icons/ri"
+import { GiWeightLiftingUp } from "react-icons/gi"
+import { GiWhiteBook } from "react-icons/gi"
+import { IoWater } from "react-icons/io5"
+import { GiMeditation } from "react-icons/gi"
+import { GiNotebook } from "react-icons/gi"
+import { GiNightSleep } from "react-icons/gi"
+import { FaRunning } from "react-icons/fa"
+import { IoMdLaptop } from "react-icons/io"
+import { IoFastFood } from "react-icons/io5"
+import { TbTargetArrow } from "react-icons/tb"
+
+
+<TiHeartFullOutline />
+<TbFlowerFilled />
+<PiFlowerLotusFill />
+<FaLeaf />
+<FaSmile />
+<BsStars />
+<MdOutlineStar />
+<FaSmileBeam />
+<RiDiamondFill />
+<GiWeightLiftingUp />
+<GiWhiteBook />
+<IoWater />
+<GiMeditation />
+<GiNotebook />
+<GiNightSleep />
+<FaRunning />
+<IoMdLaptop />
+<IoFastFood />
+<TbTargetArrow />

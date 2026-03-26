@@ -1,0 +1,100 @@
+import styles from "./index.css";
+import Router, { withRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
+import { apifetchv2, getFormattedDate, notify } from "../../utils";
+import Table from "../Table";
+import { MERCHANT_BASE_URL, SSO_BASE_URL } from "../../utils/constants";
+
+export default withRouter(({ active, router: { query, back }, token }) => {
+  const pageUrl = `${MERCHANT_BASE_URL}/administration`;
+  const { action, tab, ...props } = query;
+  const { page = 1, q, param } = query;
+
+  const [auditTrails, setAuditTrails] = useState([])
+  const [allAuditTrails, setAllAuditTrails] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  let url = `${SSO_BASE_URL}/user/auditTrail/`
+  const options = {
+    url,
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+
+  const fetchAuditLogApiCall = () => {
+    apifetchv2(options).then((response) => {
+      if (response && response.status != 'SUCCESS') setIsLoading(false)
+      if (response && response.status == 'SUCCESS') {
+        const formatted = response.auditTrail.map(trail => ({
+          ...trail,
+          name: `${trail.createdBy.firstName} ${trail.createdBy.lastName}`,
+          email: trail.createdBy.email
+        }))
+        setAllAuditTrails(formatted)
+        setAuditTrails(formatted)
+        setIsLoading(false)
+      }
+    })
+  }
+
+  useEffect(() => {
+    fetchAuditLogApiCall()
+  }, [active])
+
+  const onSearch = (q, param) => {
+    if (q && param) {
+      const filtered = allAuditTrails.filter(trail =>
+        trail[q] && trail[q].toLowerCase().includes(param.toLowerCase())
+      )
+      setAuditTrails(filtered)
+    } else {
+      setAuditTrails(allAuditTrails)
+    }
+  };
+
+  if (tab != 'auditLog') {
+    return (<></>)
+  } else {
+    return (
+      <>
+        {isLoading && (
+          <p>Loading data...</p>
+        )}
+        {!isLoading && auditTrails.length > 0 && (
+          <Table
+            label={'AUDIT LOG'}
+            handleSearch={onSearch}
+            searchQueries={['name', 'email']}
+          >
+            <tr>
+              <th>#</th>
+              <th>Date/Time</th>
+              <th>User</th>
+              <th>IP Address</th>
+              <th>Feature</th>
+              <th>Action</th>
+              <th>Description</th>
+            </tr>
+            {auditTrails.map((auditTrail, count) => {
+              return <tr key={count}>
+                <td>{count + 1}</td>
+                <td>{getFormattedDate(auditTrail.createdTime)}</td>
+                <td>{auditTrail.name}</td>
+                <td>{auditTrail.ipAddress}</td>
+                <td>{auditTrail.feature}</td>
+                <td>{auditTrail.action}</td>
+                <td>{auditTrail.description}</td>
+              </tr>
+            })}
+          </Table>
+        )}
+        {!isLoading && auditTrails.length == 0 && (
+          <>No data is returned</>
+        )}
+        <style jsx>{styles}</style>
+      </>
+    )
+  }
+});

@@ -4,6 +4,7 @@ import "@/styles/globals.css"
 import Link from "next/link"
 import Image from "next/image"
 import MomentumLogo from '@/public/momentum-logo.jpeg'
+import Hamburger from "@/components/Hamburger"
 
 const bodoni = Bodoni_Moda({
   subsets: ['latin'],
@@ -62,7 +63,11 @@ export default function RootLayout({
             </Link>
           </div>
 
-          <div className="flex-1">
+          <div className="hidden lg:block">
+            <Hamburger />
+          </div>
+
+          <div>
             {children}
           </div>
 

@@ -1,0 +1,616 @@
+import { withAuth } from "../../../../utils/auth";
+import { useUser } from "../../../../utils/UserContext";
+import { MERCHANT_BASE_URL, GOVMAIL_BASE_URL, INTEGRATION_URL, CDE_BASE_URL } from "../../../../utils/constants";
+import getConfig from "next/config";
+import style from "../index.module.css";
+import { useState, useLayoutEffect, useEffect } from "react";
+import reactModalVideoStyles from "react-modal-video/css/modal-video.min.css";
+
+const { publicRuntimeConfig } = getConfig();
+import Link from "next/link";
+import Modal from "react-modal";
+import { AuthenticationErrorHandler } from "../../../../utils/error";
+import { apifetchv2, notify } from "../../../../utils";
+import QRPage from "./qr-page";
+import ContentWrapper from '../../../../components/ContentWrapper';
+import Alert from '../../../../components/Alert';
+import ProgressBar from '../../../../components/ProgressBar';
+import CIModal from '../../../../components/CIModal';
+import ArrowRight from '../../../../components/Lines/ArrowRight';
+import ContactDetailsForm from '../../../../components/ContactDetailsForm';
+import AdminAppCard from '../../../../components/AdminAppCardsMobile';
+import ModalVideo from 'react-modal-video';
+
+const ecmsImg = "/static/img/1Gov/ECMS.svg";
+const emailImg = "/static/img/1Gov/Email.png";
+const govotpicon = "/static/img/1Gov/govotpicon.svg";
+const cdeImg = "/static/img/1Gov/GovDrive3.svg";
+const conferenceImg = "/static/img/1Gov/Conferencing.png";
+
+
+const environment = publicRuntimeConfig.ENVIRONMENT;
+
+
+const videos = [
+  { id: "SELjye1-kh8", title: "Gov Drive", subtitle: " Explore how Gov Drive empowers seamless document uploading and storage in this informative video." },
+  { id: "ekPQueVksXQ", title: "Inter MDA Request", subtitle: "Discover how to enhance inter-agency collaboration on 1Gov in this informative tutorial video." },
+  { id: "X4pz-igI7C4", title: "Navigating ECMS", subtitle: "Master the Enterprise Content Management System (ECMS) on 1Gov! Explore our step-by-step tutorial for seamless navigation." },
+  { id: "Onjy7f0jeGA", title: "Request Approval", subtitle: "Learn how to effortlessly request approvals on 1gov! Discover step-by-step instructions in this informative video guide." },
+  { id: "9ADIbzT81BM", title: "e-Signature", subtitle: "This video tutorial walks you through how to streamline document and memo signing within government agencies." },
+  { id: "NRyYC04geic", title: "Introducing 1Gov Cloud", subtitle: "Experience operational transformation and enhanced productivity with the power of 1Government Cloud.." },
+  // Add more videos as needed
+];
+
+export default withAuth(({ token }) => {
+  const user = useUser();
+  const { roles, apps, merchantStatus, merchantApps, accessToken } = user;
+  const stage = merchantStatus ? merchantStatus.code : -1;
+  const isSuperAdmin = roles === "SUPERADMIN" ? true : false;
+  const [sortedApps, setSortedApps] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [openVideoModal, setOpenVideoModal] = useState(false);
+
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isOfficeModalOpen, setOfficeModalOpen] = useState(false);
+  const [isLibreModalOpen, setLibreModalOpen] = useState(false);
+  const [selectedVideoId, setSelectedVideoId] = useState(null);
+  const [filteredVideos, setFilteredVideos] = useState(videos);
+  const [unread, setUnread] = useState('')
+  const [unreadDrive, setUnreadDrive] = useState('')
+  const [isChecked, setIsChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedApp, setSelectedApp] = useState(null);
+  const [appData, setAppData] = useState({});
+
+
+
+  const handleCheckboxChange = () => {
+    setIsChecked(!isChecked);
+  };
+  // Handle card click, update state with the selected app data
+  const handleCardClick = (name, image, dataUrlApple, dataUrlGoogle, qrImage
+  ) => {
+    setAppData({
+      name,
+      image,
+      dataUrlApple,
+      dataUrlGoogle,
+      qrImage
+    });
+    setSelectedApp(true); // Switch to QRPage view
+  };
+
+
+  const handleDownload = (downloadlink) => {
+    const link = document.createElement('a');
+    notify('Download has started', "SUCCESS")
+    link.href = downloadlink;
+    link.download = 'Apache_OpenOffice.zip';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+
+  const renderVideoImage = (videoId) => {
+    switch (videoId) {
+      case 'SELjye1-kh8':
+        return <img src="/static/img/1Gov/gov-drive.webp" alt="Video 1" width={200} />;
+      case 'ekPQueVksXQ':
+        return <img src="/static/img/1Gov/inter-mda.webp" alt="Video 2" width={200} />;
+      case 'X4pz-igI7C4':
+        return <img src="/static/img/1Gov/new-ecms.webp" alt="Video 3" width={200} />;
+      case 'Onjy7f0jeGA':
+        return <img src="/static/img/1Gov/request-approvals.webp" alt="Video 4" width={200} />;
+      case '9ADIbzT81BM':
+        return <img src="/static/img/1Gov/e-signature.webp" alt="Video 5" width={200} />;
+      case 'NRyYC04geic':
+        return <img src="/static/img/1Gov/onegov-intro.png" alt="Video 5" width={200} />;
+      // Add cases for other videos as needed
+      default:
+        return <img src="/static/img/1Gov/explainer.svg" alt="Default Video" width={200} />;
+    }
+  };
+
+  const customStyles = {
+    overlay: {
+      backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    },
+    content: {
+      width: "85%",
+      height: "85%",
+      margin: "auto",
+      marginTop: 40,
+      zIndex: 100000,
+    },
+  };
+  const customStyles2 = {
+    overlay: {
+      backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    },
+    content: {
+      paddingTop: 20,
+      paddingBottom: 20,
+      width: "50%",
+      height: "400px",
+      margin: "auto",
+      marginTop: 80,
+      zIndex: 100000,
+    },
+  };
+
+
+
+  const getMessageStat = async () => {
+    try {
+      const url = `${GOVMAIL_BASE_URL}/message/getMessageStat`;
+      const options = {
+        url,
+        headers: { Authorization: `Bearer ${token}` },
+        method: "GET",
+        catchCallback: AuthenticationErrorHandler,
+      };
+      const response = await apifetchv2(options);
+
+      if (response && response.object) {
+        setUnread(response.object.unread);
+      } else {
+        console.error('No response object found');
+      }
+    } catch (error) {
+      console.error('Error occurred while fetching message stats:', error.message);
+    }
+  };
+  const getDriveMessageStat = async () => {
+    try {
+      const url = `${CDE_BASE_URL}/document/findFilesPendingAcceptance`;
+      const options = {
+        url,
+        headers: { Authorization: `Bearer ${token}` },
+        method: "GET",
+        catchCallback: AuthenticationErrorHandler,
+      };
+      const response = await apifetchv2(options);
+      if (response && response.object) {
+        setUnreadDrive(response.object.length);
+      } else {
+        console.error('No response object found');
+      }
+    } catch (error) {
+      console.error('Error occurred while fetching message stats:', error.message);
+    }
+  };
+
+
+
+  const handleSearchChange = (event) => {
+    const searchTerm = event.target.value.toLowerCase();
+    const filtered = videos.filter((video) =>
+      video.title.toLowerCase().includes(searchTerm)
+    );
+    setFilteredVideos(filtered);
+  };
+
+
+
+  // const handleModal = (type) => {
+  //  setModalOpen(true);
+  // };
+
+  const handleModal = (type) => {
+    if (type === 'video') {
+      setModalOpen(true);
+    } else if (type === 'apache') {
+      setOfficeModalOpen(true);
+    } else if (type === 'libre') {
+      setLibreModalOpen(true);
+    }
+  };
+  const closeModal = (type) => {
+    if (type === 'video') {
+      setModalOpen(false);
+    } else if (type === 'apache') {
+      setOfficeModalOpen(false);
+    } else if (type === 'libre') {
+      setLibreModalOpen(false);
+    }
+  };
+
+
+  useEffect(() => {
+    getMessageStat();
+    getDriveMessageStat();
+  }, []);
+
+
+  useLayoutEffect(() => {
+    let items = Object.keys(apps || {});
+    let sorting = ["govmail", "com", "ucg", "wfm", "ims", "conferencing"];
+    let sortedApps = [];
+    sorting.forEach(function (key) {
+      let found = false;
+      items = items.filter(function (item) {
+        if (!found && item == key) {
+          sortedApps.push(item);
+          found = true;
+          return false;
+        } else return true;
+      });
+    });
+    setSortedApps(sortedApps);
+    // set profile modal for superadmin only
+    if (isSuperAdmin) {
+      let staged = stage < 5 ? true : false;
+      setShowModal(staged);
+    }
+  }, [apps]);
+
+
+
+  const getStartedNum = (name) => sortedApps.findIndex((el) => el == name) + 1;
+  const isDisabled = merchantStatus && merchantStatus.code < 5 ? true : false;
+  return (
+    <ContentWrapper className="merchant-dashboard">
+      <Alert />
+      <section className="content">
+        <div className="box box-solid">
+          <div className="application-content_wrapper">
+
+            <div className="application-applications_sect">
+              {!selectedApp ? (
+                <div>
+                  <div className="welcome-cont">
+                    <div className="welcome-cont-img">
+                      <img src="/static/img/1Gov/mobilewelcome.svg" alt="" />
+                    </div>
+                    <div className="welcome-cont-text-mobile">
+                      <p>WELCOME!</p>
+                      <p>Download Your 1Government </p>
+                      <p>mobile apps here</p>
+                    </div>
+                  </div>
+
+                  <div className="app-card-container">
+                    <AdminAppCard
+                      name="Gov OTP"
+                      image={govotpicon}
+                      dataUrlApple="https://apps.apple.com/us/app/govotp-by-gbb/id6742083659"
+                      dataUrlGoogle="https://play.google.com/store/apps/details?id=com.onegoveauthenticator&hl=en"
+                      qrImage="/static/img/1Gov/govotp.jpg"
+                      onClick={() => handleCardClick("Gov OTP", govotpicon, "https://apps.apple.com/us/app/govotp-by-gbb/id6742083659", "https://play.google.com/store/apps/details?id=com.onegoveauthenticator&hl=en", "/static/img/1Gov/govotp.jpeg")}
+                    />
+                    <AdminAppCard
+                      name="Gov Drive"
+                      image={cdeImg}
+                      dataUrlApple="https://apps.apple.com/us/app/govotp-by-gbb/id6742083659"
+                      dataUrlGoogle="https://play.google.com/store/apps/details?id=com.onegoveauthenticator&hl=en"
+                      qrImage="/static/img/1Gov/gov-drive-qrcode.png"
+                      onClick={() => handleCardClick("Gov Drive", cdeImg, "", "https://play.google.com/store/apps/details?id=ng.com.galaxybackbone.drive", "/static/img/1Gov/gov-drive-qrcode.png")}
+                    />
+                    <AdminAppCard
+                      name="Gov Conference"
+                      image={conferenceImg}
+                      dataUrlApple="https://apps.apple.com/us/app/govotp-by-gbb/id6742083659"
+                      dataUrlGoogle="https://play.google.com/store/apps/details?id=com.onegoveauthenticator&hl=en"
+                      qrImage=""
+                      onClick={() => handleCardClick("Gov Conference", conferenceImg, "https://apps.apple.com/us/app/govotp-by-gbb/id6742083659", "https://play.google.com/store/apps/details?id=com.onegoveauthenticator&hl=en", "")}
+                    />
+                    <AdminAppCard
+                      name="Gov Mail"
+                      image={emailImg}
+                      dataUrlApple="https://apps.apple.com/us/app/govotp-by-gbb/id6742083659"
+                      dataUrlGoogle="https://play.google.com/store/apps/details?id=com.onegoveauthenticator&hl=en"
+                      qrImage=""
+                      onClick={() => handleCardClick("Gov Mail", emailImg, "https://apps.apple.com/us/app/govotp-by-gbb/id6742083659", "https://play.google.com/store/apps/details?id=com.onegoveauthenticator&hl=en", "")}
+                    />
+                    <AdminAppCard
+                      name="Gov ECMS"
+                      image={ecmsImg}
+                      dataUrlApple="https://apps.apple.com/us/app/govotp-by-gbb/id6742083659"
+                      dataUrlGoogle="https://play.google.com/store/apps/details?id=com.onegoveauthenticator&hl=en"
+                      qrImage=""
+                      onClick={() => handleCardClick("Gov ECMS", ecmsImg, "https://apps.apple.com/us/app/govotp-by-gbb/id6742083659", "https://play.google.com/store/apps/details?id=com.onegoveauthenticator&hl=en", "")}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <QRPage
+                  name={appData.name}
+                  image={appData.image}
+                  dataUrlApple={appData.dataUrlApple}
+                  dataUrlGoogle={appData.dataUrlGoogle}
+                  imageUrl={appData.qrImage}
+                  onBackClick={() => setSelectedApp(false)}
+                />
+              )}
+              <div style={{ marginBottom: "1.3rem" }}></div>
+            </div>
+            <div className="application-gs_sect">
+              <div className="gs_sect-head">
+                <p>Let’s help you get started</p>
+              </div>
+              <div
+                className="video-cont"
+                onClick={() => setOpenVideoModal(true)}
+              >
+              </div>
+              {stage < 9 && (
+                <div className="profile-completion">
+                  <p className="_title">Complete your profile</p>
+                  <ProgressBar
+                    progress={stage < 5 ? 60 : 80}
+                    status="warning"
+                  />
+                  <p className="_desc">
+                    Complete your profile and enjoy full access to all the
+                    1Government apps and features.
+                  </p>
+                  {stage < 5 && (
+                    <a
+                      onClick={() => setShowModal(true)}
+                      className="cursor-pointer"
+                    >
+                      Complete profile
+                    </a>
+                  )}
+                  {stage == 5 && (
+                    <Link href={`${MERCHANT_BASE_URL}/setup/success?step=1`}>
+                      <a className="cursor-pointer">Complete profile</a>
+                    </Link>
+                  )}
+                </div>
+              )}
+
+              <div
+                className="vid-img"
+              // onClick={() => setOpenVideoModal(true)}
+              >
+                <a style={{ color: "#035e35", cursor: "pointer" }} onClick={() => handleModal('video')}>
+                  <img src="/static/img/1Gov/explainerimg.svg" alt="" width="100%" /></a>
+              </div>
+              <div className="whats-new-cont">
+                <div className="img-sect">
+                  <img src="/static/img/bulb.svg" alt="light bulb" />
+                </div>
+                <div className="text-cont">
+                  <p>What’s new on 1Government cloud?</p>
+                  <p>
+                    See our latest features and improvements with our users’
+                    feedback in mind.
+                  </p>
+                  <a href="#">Learn more </a>
+                </div>
+              </div>
+              <div className="whats-new-banner">
+                <div className="img-sect">
+                  <img src="/static/img/think.png" alt="light bulb" />
+                </div>
+                <div className="banner-cont">
+                  <p>Test your knowledge of 1Gov Cloud</p>
+                  <a href="https://1gov.testportal.net/test.html?t=NP5EiqCp65rS">
+                    Get Started{" "}
+                  </a>
+                </div>
+              </div>
+              <div className="whats-new-banner">
+                <div className="img-sect">
+                  <img src="/static/img/think.png" alt="light bulb" />
+                </div>
+                <div className="banner-cont">
+                  <p>1Gov Project Management</p>
+                  <a href="https://1gov.testportal.net/test.html?t=XZxkZCuSmiaq">
+                    Test your knowledge{" "}
+                  </a>
+                </div>
+              </div>
+
+              <div className="whats-new-banner position-relative">
+                <a
+                  className="d-inline-block position-relative"
+                  style={{ color: "#035e35", cursor: "pointer" }}
+                  onClick={() => handleModal('apache')}                >
+                  <img
+                    src="/static/img/1Gov/apache-image.png"
+                    alt="Open Office"
+                    className="img-fluid"
+                  />
+                  <div className="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50 text-white fw-bolder fs-5">
+                    Click to download
+                  </div>
+                </a>
+              </div>
+
+              <div className="whats-new-banner position-relative">
+                <a
+                  className="d-inline-block position-relative"
+                  style={{ color: "#035e35", cursor: "pointer" }}
+                  onClick={() => handleModal('libre')}
+                >
+                  <img
+                    src="/static/img/1Gov/libre.jpeg"
+                    alt="Libre Office"
+                    className="img-fluid"
+                  />
+                  <div className="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50 text-white fw-bolder fs-5">
+                    Click to download
+                  </div>
+                </a>
+              </div>
+
+
+            </div>
+          </div>
+          <ModalVideo
+            channel="youtube"
+            isOpen={openVideoModal}
+            videoId="hDyczNYR5O0"
+            onClose={() => setOpenVideoModal(false)}
+          />
+        </div>
+      </section>
+
+      <CIModal show={showModal} onClose={() => null} noHeader>
+        <div className="profile-completion-modal">
+          <p className="title">Please complete your profile</p>
+          <p className="note">
+            Complete your profile and enjoy full access to all the 1Gov apps and
+            features.
+          </p>
+          <ContactDetailsForm
+            handleSkip={() => {
+              setShowModal(false);
+              return true;
+            }}
+            token={accessToken}
+            user={user}
+          />
+        </div>
+      </CIModal>
+
+      <style jsx>{style}</style>
+      <style jsx>{reactModalVideoStyles}</style>
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => closeModal('video')}
+        contentLabel="List Modal"
+        style={customStyles}
+      >
+        <div className="modal-header">
+          <h2 className="modal-title fs-4">Explore Our  Video Library</h2>
+          <button type="button" className="btn-close" aria-label="Close" onClick={() => closeModal('video')}></button>
+        </div>
+        <div className="modal-body">
+          <div className="input-group my-3 " style={{ width: '40%' }}>
+            <span className="input-group-text">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              className="form-control rounded-end"
+              placeholder="Search videos..."
+              aria-label="Search videos"
+              onChange={handleSearchChange}
+            />
+          </div>
+          <p>Discover various Explainer videos covering a wide range of features to help you navigate 1government Applications</p>
+          <div className="video-grid">
+            {filteredVideos.map((video, index) => (
+              <div key={index} className="video-item border p-2 mx-auto rounded" onClick={() => setSelectedVideoId(video.id)}>
+                {renderVideoImage(video.id)}
+
+                <ModalVideo
+                  channel="youtube"
+                  isOpen={selectedVideoId === video.id}
+                  videoId={selectedVideoId}
+                  onClose={() => {
+                    window.location.href = `/admin/tenant`;
+                    setSelectedVideoId(null);
+                  }}
+                />
+                <h3 className="text-success text-start fw-bold fs-6 pt-2">{video.title}</h3>
+                <p className="text-muted text-start" style={{ fontSize: '10px' }}>{video.subtitle}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Modal>
+      <Modal
+        isOpen={isOfficeModalOpen}
+        onRequestClose={() => closeModal('apache')}
+        contentLabel="List Modal"
+        style={customStyles2}
+      >
+        <div className="modal-header mb-4">
+          <h2 className="modal-title fs-4 w-100 text-center">Instructions to download Apache Open Office</h2>
+          <button type="button" className="btn-close" aria-label="Close" onClick={() => closeModal('apache')}></button>
+        </div>
+        <div className="modal-body">
+          <ul className="list-group list-group-numbered">
+            <li className="list-group-item">Click on the “Download Apache Open Office” link.</li>
+            <li className="list-group-item">Proceed to download Apache OpenOffice on your local PC.</li>
+            <li className="list-group-item">Unzip (Unpack) the Apache OpenOffice to choose the Operating system of your local computer.</li>
+            <li className="list-group-item">Proceed to install on your PC.</li>
+          </ul>
+          <div className="mt-2 text-center">
+            <div className="form-check d-inline-flex align-items-center mt-2">
+              <input
+                className={`form-check-input ${isChecked ? 'checked' : ''}`}
+                type="checkbox"
+                id="downloadCheckbox"
+                checked={isChecked}
+                onChange={handleCheckboxChange}
+              />
+              <label className="form-check-label ms-2" htmlFor="downloadCheckbox">
+                I want to download Apache Open Office
+              </label>
+            </div>
+            <div className="">
+              <button onClick={() => handleDownload(`${INTEGRATION_URL}/downloads/resource/Apache_OpenOffice_MacOS_x86-64_install_en-US.zip`)} disabled={!isChecked || isLoading} className={` downloadButton office-btn mt-2 mx-2 ${!isChecked ? 'btn-disabled' : ''}`}>
+                <span>Download for Mac <i className="fab fa-apple fa-lg px-2"></i></span>
+              </button>
+              <button onClick={() => handleDownload(`${INTEGRATION_URL}/downloads/resource/Apache_OpenOffice_Win_x86_install_en-US.zip`)} disabled={!isChecked || isLoading} className={` downloadButton office-btn mt-2 ${!isChecked ? 'btn-disabled' : ''}`}>
+                <span>Download for Windows <i className="fab fa-windows fa-lg px-2"></i></span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </Modal>
+      <Modal
+        isOpen={isLibreModalOpen}
+        onRequestClose={() => closeModal('libre')}
+        contentLabel="List Modal"
+        style={customStyles2}
+      >
+        <div className="modal-header mb-4">
+          <h2 className="modal-title fs-4 w-100 text-center">Instructions to download Libre Office</h2>
+          <button type="button" className="btn-close" aria-label="Close" onClick={() => closeModal('libre')}></button>
+        </div>
+        <div className="modal-body">
+          <ul className="list-group list-group-numbered">
+            <li className="list-group-item">Click on the “Download Libre Office” link.</li>
+            <li className="list-group-item">Proceed to download Libre Office on your local PC.</li>
+            <li className="list-group-item">Unzip (Unpack) the Libre Office to choose the Operating system of your local computer.</li>
+            <li className="list-group-item">Proceed to install on your PC.</li>
+          </ul>
+          <div className="mt-2 text-center">
+            <div className="form-check d-inline-flex align-items-center mt-2">
+              <input
+                className={`form-check-input ${isChecked ? 'checked' : ''}`}
+                type="checkbox"
+                id="downloadCheckbox"
+                checked={isChecked}
+                onChange={handleCheckboxChange}
+              />
+              <label className="form-check-label ms-2" htmlFor="downloadCheckbox">
+                I want to download Libre Office
+              </label>
+            </div>
+            <div className="">
+              <button onClick={() => handleDownload(`${INTEGRATION_URL}/downloads/resource/LibreOffice_24.2.5_MacOS.zip`)} disabled={!isChecked || isLoading} className={` downloadButton office-btn mt-2 mx-2 ${!isChecked ? 'btn-disabled' : ''}`}>
+                <span>Download for Mac <i className="fab fa-apple fa-lg px-2"></i></span>
+              </button>
+              <button onClick={() => handleDownload(`${INTEGRATION_URL}/downloads/resource/LibreOffice_24.2.5_WinOS.zip
+`)} disabled={!isChecked || isLoading} className={` downloadButton office-btn mt-2 ${!isChecked ? 'btn-disabled' : ''}`}>
+                <span>Download for Windows <i className="fab fa-windows fa-lg px-2"></i></span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </Modal>
+      {/* <ChatWidget /> */}
+
+      <style jsx>{`
+        .app-card-container {
+          display: flex;
+          flex-wrap: wrap;
+          margin-right: -0.8rem;
+          margin-bottom: 1.3rem;
+        }
+      `}</style>
+    </ContentWrapper>
+  );
+});
