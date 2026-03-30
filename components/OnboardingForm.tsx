@@ -43,10 +43,10 @@ const OnboardingForm = () => {
     const [formData, setFormData] = useState({
         icon: "",
         name: "",
-        frequency: "",  
-        target: "",      
-        unit: "",        
-        customUnit: "",  
+        frequency: "",
+        target: "",
+        unit: "",
+        customUnit: "",
     })
 
     const scroll = (direction: "left" | "right") => {
@@ -73,7 +73,7 @@ const OnboardingForm = () => {
         setFormData((prev) => ({ ...prev, [name]: value }))
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         if (!formData.icon) {
@@ -103,12 +103,32 @@ const OnboardingForm = () => {
 
         const finalUnit = formData.unit === "other" ? formData.customUnit : formData.unit
 
-        sessionStorage.setItem("onboarding", JSON.stringify({
-            ...formData,
-            unit: finalUnit,
-        }))
+        try {
+            const res = await fetch("/api/habits", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: formData.name,
+                    icon: formData.icon,
+                    frequency: formData.frequency,
+                    target: formData.target,
+                    unit: finalUnit,
+                }),
+            })
 
-        router.push("/dashboard")
+            const data = await res.json()
+
+            if (!res.ok) {
+                alert(data.error || "Something went wrong")
+                return
+            }
+
+            router.push("/dashboard")
+
+        } catch (error) {
+            console.error(error)
+            alert("Something went wrong")
+        }
     }
 
     return (

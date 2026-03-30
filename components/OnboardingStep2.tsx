@@ -1,11 +1,11 @@
 'use client'
 
-import { useState} from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 
 const OnboardingStep2 = () => {
     const router = useRouter()
-  
+
     const [formData, setFormData] = useState({
         frequency: "",
         target: "",
@@ -18,7 +18,7 @@ const OnboardingStep2 = () => {
         setFormData((prev) => ({ ...prev, [name]: value }))
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         if (!formData.frequency) {
@@ -40,18 +40,42 @@ const OnboardingStep2 = () => {
 
         const step1 = JSON.parse(sessionStorage.getItem("onboarding") || "{}")
 
-        const finalUnit = formData.unit === "other" ? formData.customUnit : formData.unit
-
-        const fullHabitData = {
-            ...step1,
-            frequency: formData.frequency,
-            target: formData.target,
-            unit: finalUnit,
+        // If step1 data is missing, something went wrong
+        if (!step1.name || !step1.icon) {
+            alert("Something went wrong. Please go back and try again.")
+            return
         }
 
-        sessionStorage.setItem("onboarding", JSON.stringify(fullHabitData))
+        const finalUnit = formData.unit === "other" ? formData.customUnit : formData.unit
 
-        router.push("/dashboard")
+        try {
+            const res = await fetch("/api/habits", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: step1.name,
+                    icon: step1.icon,
+                    frequency: formData.frequency,
+                    target: formData.target,
+                    unit: finalUnit,
+                }),
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                alert(data.error || "Something went wrong")
+                return
+            }
+
+            sessionStorage.removeItem("onboarding")
+
+            router.push("/dashboard")
+
+        } catch (error) {
+            console.error(error)
+            alert("Something went wrong")
+        }
     }
 
     return (
