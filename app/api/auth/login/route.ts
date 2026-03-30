@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
+import { createSession } from '@/lib/session';
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,6 +40,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    await createSession(user._id.toString())
 
     return NextResponse.json(
       {

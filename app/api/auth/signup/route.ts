@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
+import { createSession } from '@/lib/session';
 
 interface SignupData {
   fullName: string;
@@ -55,6 +56,8 @@ export async function POST(request: NextRequest) {
       email: email.toLowerCase().trim(),
       password: hashedPassword,
     });
+
+    await createSession(newUser._id.toString())
 
     const baseUrl = new URL(request.url).origin;
 

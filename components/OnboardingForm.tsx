@@ -108,7 +108,7 @@ const OnboardingForm = () => {
             unit: finalUnit,
         }))
 
-        router.push("/onboarding/step2")
+        router.push("/dashboard")
     }
 
     return (
