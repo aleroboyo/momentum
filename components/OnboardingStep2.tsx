@@ -49,7 +49,7 @@ const OnboardingStep2 = () => {
         const finalUnit = formData.unit === "other" ? formData.customUnit : formData.unit
 
         try {
-            const res = await fetch("/api/habits", {
+            const res = await fetch("/api/auth/habits", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
