@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #333;">Hello ${fullName}!</h2>
-          <h4>Welcome to our Momentum 🎉</h4>
+          <h4>Welcome to Momentum 🎉</h4>
           <p>Your account has been created successfully.</p>
           <p>Your username is ${username}!
           <p>Start exploring now!</p>

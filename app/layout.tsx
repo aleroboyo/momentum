@@ -1,10 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { Bodoni_Moda, Inter } from "next/font/google"
 import "@/styles/globals.css"
-import Link from "next/link"
-import Image from "next/image"
-import MomentumLogo from '@/public/momentum-logo.jpeg'
-import Hamburger from "@/components/Hamburger"
 
 const bodoni = Bodoni_Moda({
   subsets: ['latin'],
@@ -49,29 +45,11 @@ export default function RootLayout({
 
       <body className={`${bodoni.variable} ${inter.variable} antialiased`}>
 
-        <div className="min-h-screen w-full flex flex-col bg-linear-to-b from-[#0d4212] to-[#010602] overflow-auto">
-
-          <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <span className="tinyBlob tinyBlob1" />
-            <span className="tinyBlob tinyBlob2" />
-            <span className="tinyBlob tinyBlob3" />
-          </div>
-
-          <div className="p-4 lg:hidden">
-            <Link href="/">
-              <Image src={MomentumLogo} alt="Momentum Logo" width={130} height={130} />
-            </Link>
-          </div>
-
-          <div className="hidden lg:block">
-            <Hamburger />
-          </div>
-
+        
           <div>
             {children}
           </div>
 
-        </div>
       </body>
     </html>
   );

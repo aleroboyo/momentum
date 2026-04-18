@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 
-const Hamburger = () => {
+const NavBar = () => {
     return (
         <div className="relative z-20 text-[#fff5d7] font-inter py-10 px-6 flex items-center justify-between">
             <div className="">
@@ -38,4 +38,4 @@ const Hamburger = () => {
     )
 }
 
-export default Hamburger
+export default NavBar

@@ -1,0 +1,386 @@
+import { toast } from "react-toastify";
+import { isEmpty } from "ramda";
+import { INTEGRATION_URL, UCG_API_BASE_URL } from "./constants";
+import { AuthenticationErrorHandler, AuthenticationError } from "./error";
+
+
+toast.configure();
+
+export const notifyConfig = {
+  config: {
+    position: toast.POSITION.BOTTOM_LEFT,
+    hideProgressBar: true,
+  },
+  success: "SUCCESS",
+  error: "ERROR",
+  info: "INFO",
+};
+
+export const notify = (message, type = notifyConfig.info) => {
+  if (type === notifyConfig.success) {
+    toast.success(message, notifyConfig.config);
+  } else if (type === notifyConfig.error) {
+    toast.error(message, notifyConfig.config);
+  } else {
+    toast(message, notifyConfig.config);
+  }
+};
+
+export const submitForm = async ({
+  url,
+  values,
+  setSubmitting,
+  resetForm,
+  defaultValues,
+  isAuthenticated = false,
+  token = "",
+  isFormData,
+  shouldNotifyOnSuccess = true,
+  successMessage = "Submitted Succesfully",
+  setSubmittingOnSuccess = true,
+  setSubmittingOnError = true,
+  method = "POST",
+  filesProperties = [],
+  formDataJsonPropertyName,
+  redirectUrl,
+}) => {
+  try {
+    // let options;
+    let headers;
+    let body = values;
+    let contentType = "application/json";
+
+    if (isFormData) {
+      //build the form data
+      let formData = new FormData();
+      let json = { ...values };
+      if (json.files) {
+        // append attached files
+        json.files.forEach((value) => formData.append("file", value));
+        //remove files from object
+        const { files, ...x } = json;
+        json = { ...x };
+      }
+      if (json.iceFiles) {
+        json.iceFiles.forEach((value) => formData.append("file", value));
+        delete json.iceFiles;
+      }
+      if (json.refereeFiles) {
+        json.refereeFiles.forEach((value) =>
+          formData.append("refereeFiles", value)
+        );
+        const { refereeFiles, ...x } = json;
+        json = { ...x };
+      }
+      if (filesProperties.length > 0) {
+        filesProperties.forEach(
+          (file) =>
+            json[file] &&
+            json[file].forEach((value) => {
+              formData.append(file, value);
+              delete json[file];
+            })
+        );
+      }
+
+      // append the other values as a JSON file
+      if (!isEmpty(json)) {
+        if (formDataJsonPropertyName) {
+          formData.append(
+            formDataJsonPropertyName,
+            new Blob([JSON.stringify(json)], { type: "application/json" })
+          );
+        } else {
+          formData.append(
+            "json",
+            new Blob([JSON.stringify(json)], { type: "application/json" })
+          );
+        }
+      }
+      // set request headers
+      // options = {
+      //   body: formData
+      // };
+      body = formData;
+      contentType = "";
+      // headers = {
+      //   // "Content-Type": "multipart/form-data"
+      // };
+    }
+
+    if (isAuthenticated && token) {
+      headers = {
+        ...headers,
+        Authorization: `Bearer ${token}`,
+      };
+    }
+
+    // make api request
+    let data = await apifetchv2({
+      url,
+      method,
+      body,
+      headers,
+      contentType,
+      catchCallback: AuthenticationErrorHandler,
+    });
+
+    if (!data) {
+      notify("Request failed. Please try again.", notifyConfig.error);
+      return;
+    }
+
+    // let data = await apifetch(
+    //   url,
+    //   "POST",
+    //   [],
+    //   options,
+    //   AuthenticationErrorHandler
+    // );
+    if (
+      data &&
+      (
+        data.status === "CREATED" ||
+        data.status === "SUCCESS" ||
+        data.status === "success" ||
+        data.message ||          
+        data.data                
+      )
+    ) {
+      if (setSubmitting && setSubmittingOnSuccess) {
+        setSubmitting(false);
+      }
+      if (shouldNotifyOnSuccess) {
+        notify(
+          successMessage ? successMessage : "Successful",
+          notifyConfig.success
+        );
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
+        } else if (redirectUrl !== false) {
+          setTimeout(() => {
+            window.location.href = '/admin/tenant/administration?tab=user-mgt';
+          }, 1000);
+        }
+      }
+
+      if (resetForm) {
+        resetForm({ values: defaultValues });
+      }
+      return data;
+    } else {
+      if (setSubmitting && setSubmittingOnError) {
+        setSubmitting(false);
+      }
+      let message = "Failed! Check your details, and try again!";
+      if (data.status && !Array.isArray(data.data)) {
+        message =
+          data.data && data.data.message ? data.data.message : data.status;
+      } else if (data.message) {
+        message = data.message;
+      }
+      else if (data.data && data.data.message) {
+        message = data.data.message;
+      } else if (Array.isArray(data.data)) {
+        message = "";
+        data.data.forEach((value) => (message += ` ${value.message}. `));
+      }
+
+      notify(message, notifyConfig.error);
+    }
+  }
+  catch (error) {
+    setSubmitting(false);
+    notify("An error occured, please try again.", notifyConfig.error);
+  }
+};
+
+export const nameEnquiry = async (bankCode, accountNumber) => {
+  let accountName = "";
+  try {
+    if (accountNumber.length === 10 && bankCode) {
+      const options = {
+        url: `${UCG_API_BASE_URL}/BankPartner/rpc/ucgservice/verifyaccount?accountNum=${accountNumber}&bankCode=${bankCode}`,
+        catchCallback: () => null,
+      };
+      const response = await apifetchv2(options);
+      if (
+        response &&
+        response.status === "success" &&
+        response.data.accountname
+      ) {
+        accountName = response.data.accountname;
+      } else {
+        notify("Invalid Bank Details", notifyConfig.error);
+      }
+    }
+  } catch (error) {
+    notify("Invalid Bank Details", notifyConfig.error);
+  } finally {
+    return accountName;
+  }
+};
+
+export const apifetch = async (
+  url,
+  method = "GET",
+  body = [],
+  extraOptions = {},
+  catchCallback
+) => {
+  try {
+    let options = { method, ...extraOptions };
+    if (method === "POST") {
+      if (!extraOptions.headers) {
+        options.headers = {
+          "Content-Type": "application/json",
+        };
+      }
+      if (!extraOptions.body) {
+        options.body = JSON.stringify(body);
+      }
+    }
+    let response = await fetch(url, options);
+    if (response.status === 401) {
+      throw new AuthenticationError("Not Authenticated");
+    } else {
+      let json = await response.json();
+      return json;
+    }
+  } catch (error) {
+    let message = "Error occured, please try again.";
+    if (catchCallback) {
+      let err = catchCallback(error);
+      message = err ? err : message;
+    } else {
+      notify(message, notifyConfig.error);
+    }
+    notify(message, notifyConfig.error);
+  }
+};
+
+export const apifetchv2 = async (options) => {
+  const {
+    url,
+    method = "GET",
+    body,
+    headers: h = {},
+    extraOptions = {},
+    catchCallback,
+    contentType = "application/json",
+  } = options;
+  try {
+    let httpOptions = {};
+    let headers = { ...h };
+    if (method === "POST" || method === "PUT") {
+      if (contentType != "") {
+        headers = { ...headers, "Content-Type": contentType };
+      }
+      if (body) {
+        httpOptions["body"] =
+          contentType == "application/json" ? JSON.stringify(body) : body;
+      }
+    }
+    httpOptions = { ...httpOptions, method, headers, ...extraOptions };
+    const response = await fetch(url, httpOptions);
+    if (response.status === 401) {
+      throw new AuthenticationError("Not Authenticated");
+    } else {
+      let json = await response.json();
+      return json;
+    }
+  } catch (error) {
+    let message = "An error occured, please try again.";
+    if (catchCallback) {
+      let err = catchCallback(error);
+      message = err ? err : message;
+    } else {
+      notify(message, notifyConfig.error);
+    }
+    console.log(error);
+    // notify(message, notifyConfig.error);
+  }
+};
+
+export const isJson = (json) => {
+  try {
+    json = json.split();
+    let object = JSON.parse(json);
+    return object;
+  } catch (error) {
+    // console.log("not a valid json");
+    return false;
+  }
+};
+
+export const getFormattedDate = (datestring) => {
+  try {
+    if (datestring) {
+      var options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+      var today = new Date(datestring);
+      return today.toLocaleString("en-US");
+    }
+    return "";
+  } catch (error) {
+    return "";
+  }
+};
+
+export const formatDate = (datestring) => {
+  try {
+    var monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const date = new Date(datestring);
+    if (!date) {
+      return "";
+    }
+    var day = date.getDate();
+    var monthIndex = date.getMonth();
+    var year = date.getFullYear();
+
+    return `${day}, ${monthNames[monthIndex]} ${year}`;
+  } catch (error) {
+    return "";
+  }
+};
+
+export const getMultiArrayFromIterable = (iterable) => {
+  let object = {};
+  if (Array.isArray(iterable)) {
+    iterable.forEach((value) => {
+      if (typeof value == "string") {
+        object[value] = value;
+      }
+    });
+  } else if (typeof iterable == "object") {
+    object = iterable;
+  }
+  return Object.entries(object);
+};
+
+export const makePhoneNumber = (code, number) => {
+  const firstDigit = number[0];
+  let newPhoneNumber = `${code}${number}`;
+  if (firstDigit === "0") {
+    newPhoneNumber = `${code}${number.slice(1)}`;
+  }
+  return newPhoneNumber;
+};
