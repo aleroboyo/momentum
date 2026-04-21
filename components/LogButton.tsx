@@ -61,7 +61,7 @@ const LogButton = ({ habitId, unit, target, todayValue }: LogButtonProps) => {
           <span>Today</span>
           <span>{currentValue} / {target} {unit}</span>
         </div>
-        {/* Progress bar */}
+
         <div className="w-full h-2 bg-[#24421E]/10 rounded-full">
           <div
             className="h-2 bg-[#24421E] rounded-full transition-all"
@@ -95,7 +95,7 @@ const LogButton = ({ habitId, unit, target, todayValue }: LogButtonProps) => {
             placeholder={`e.g. ${target}`}
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="flex-1 h-10 px-4 rounded-full border-2 border-[#24421E]/30 focus:border-[#24421E] focus:outline-none text-sm bg-transparent text-[#24421E]"
+            className="flex-1 h-10 w-15 px-4 rounded-full border-2 border-[#24421E]/30 focus:border-[#24421E] focus:outline-none text-sm bg-transparent text-[#24421E]"
           />
           <span className="text-sm text-[#24421E]/60">{unit}</span>
           <button

@@ -40,7 +40,6 @@ const OnboardingStep2 = () => {
 
         const step1 = JSON.parse(sessionStorage.getItem("onboarding") || "{}")
 
-        // If step1 data is missing, something went wrong
         if (!step1.name || !step1.icon) {
             alert("Something went wrong. Please go back and try again.")
             return
@@ -49,7 +48,7 @@ const OnboardingStep2 = () => {
         const finalUnit = formData.unit === "other" ? formData.customUnit : formData.unit
 
         try {
-            const res = await fetch("/api/auth/habits", {
+            const res = await fetch("/api/habits", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

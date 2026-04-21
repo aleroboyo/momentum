@@ -16,7 +16,7 @@ const LogoutButton = () => {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 font-inter">
       {!showConfirm ? (
         <button
           onClick={() => setShowConfirm(true)}
@@ -30,13 +30,13 @@ const LogoutButton = () => {
           <div className="flex gap-4">
             <button
               onClick={handleLogout}
-              className="font-inter bg-[#fff5d7] text-[#24421E] py-3 px-8 rounded-full border-2 border-[#fff5d7] hover:text-[#fff5d7] hover:bg-[#24421E] hover:font-medium"
+              className="bg-[#fff5d7] text-[#24421E] p-2 md:py-3 md:px-8 lg:p-2 rounded-full border-2 border-[#fff5d7] hover:text-[#fff5d7] hover:bg-[#24421E] hover:font-medium"
             >
               Yes, log out
             </button>
             <button
               onClick={() => setShowConfirm(false)}
-              className="font-inter border-2 border-[#fff5d7] text-[#fff5d7] py-3 px-8 rounded-full hover:bg-[#fff5d7] hover:text-[#24421E] hover:font-medium"
+              className="border-2 border-[#fff5d7] text-[#fff5d7] py-2 px-5 md:py-3 md:px-8 lg:py-2 lg:px-5 rounded-full hover:bg-[#fff5d7] hover:text-[#24421E] hover:font-medium"
             >
               Cancel
             </button>
