@@ -3,7 +3,7 @@ import { getSession } from '@/lib/session'
 import dbConnect from '@/lib/db'
 import Habit from '@/models/Habit'
 import Log from '@/models/Log'
-import mongoose from 'mongoose' // ✅ added
+import mongoose from 'mongoose' 
 import { iconMap } from '@/lib/icons'
 import {
   getStreak,
@@ -29,7 +29,6 @@ export default async function HabitPage(props: {
 
   await dbConnect()
 
-  // ✅ FIX: ensure ObjectId
   const habitObjectId = new mongoose.Types.ObjectId(habitId)
 
   const habit = await Habit.findOne({
@@ -37,7 +36,6 @@ export default async function HabitPage(props: {
   userId: new mongoose.Types.ObjectId(userId)
 })
 
-  // ✅ TEMP DEBUG (instead of silent redirect)
   if (!habit) {
     console.log('Habit not found:', habitId)
     return <div>Habit not found</div>
@@ -56,12 +54,12 @@ export default async function HabitPage(props: {
     getWeeklyCompletion(habit._id.toString(), habit.target),
     getWeeklyTotal(habit._id.toString()),
     getTodayProgress(habit._id.toString()),
-    Log.find({ habitId: habit._id }) // ✅ uses ObjectId
+    Log.find({ habitId: habit._id }) 
       .sort({ date: -1 })
       .limit(30),
   ])
 
-  const allLogs = await Log.find({ habitId: habit._id }) // ✅ same fix
+  const allLogs = await Log.find({ habitId: habit._id }) 
 
   const average = allLogs.length > 0
     ? Math.round(allLogs.reduce((sum, log) => sum + log.value, 0) / allLogs.length)

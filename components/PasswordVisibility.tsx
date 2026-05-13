@@ -3,13 +3,14 @@
 import { useState } from 'react'
 import { IoEyeSharp, IoEyeOffSharp } from "react-icons/io5"
 
-const PasswordVisibility = ({ placeholder, value, onChange, name, width = "w-full", label }: { placeholder: string; value?: string; onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; name?: string; width?: string; label: string }) => {
+const PasswordVisibility = ({ placeholder, value, onChange, name, width = "w-full", label }: { placeholder: string; value?: string; onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; name?: string; width?: string; label?: string }) => {
 
     const [showPassword, setShowPassword] = useState(false)
 
     return (
         <>
             <div className='font-inter relative flex flex-col'>
+
                 <label className='text-[14px] md:text-lg font-bold text-left'>{label}</label>
                 <input
                     type={showPassword ? 'text' : 'password'}
