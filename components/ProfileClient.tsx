@@ -321,4 +321,4 @@ const ProfileClient = ({ user }: ProfileClientProps) => {
   )
 }
 
-export default ProfileClient
+export default ProfileClient           
